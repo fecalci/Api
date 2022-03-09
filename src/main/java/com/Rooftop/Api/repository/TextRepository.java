@@ -8,5 +8,10 @@ import com.Rooftop.Api.model.Text;
 @Repository
 public interface TextRepository extends JpaRepository <Text,Long> {
 	
-
+	Text findByContent(String textHashed);
+	
+	Text findByParameter(String charsHashed);
+	
+	Text findByParameterAndContent(String textHashed, String charsHashed);
+	
 }

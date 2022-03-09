@@ -71,8 +71,11 @@ public class TextServiceImpl {
 		return myHash;
 	}
 	
-	public Long validateExistence(String textHashed, String charsHashed) {
-		
+	public Long validateExistence(String textHashed, String charsHashed) {		
+		Text validate = textRepository.findByParameterAndContent(textHashed, charsHashed);
+		if(validate != null){
+			return validate.getId();
+		}		
 		return null;
 	}
 
