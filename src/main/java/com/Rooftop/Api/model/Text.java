@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.Map;
 
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -33,6 +34,7 @@ public class Text {
 	
 	@Column(name ="result")
 	@JsonAnyGetter
+	@ElementCollection
 	private Map<String,Integer> result;
 	
 	@Column(name = "isActive")

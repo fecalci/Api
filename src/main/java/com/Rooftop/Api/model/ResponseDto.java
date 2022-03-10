@@ -2,7 +2,6 @@ package com.Rooftop.Api.model;
 
 import javax.persistence.Entity;
 
-@Entity
 public class ResponseDto {
 	
 	private Long id;
