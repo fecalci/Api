@@ -37,7 +37,7 @@ public class Text {
 	private Map<String,Integer> result;
 	
 	@Column(name = "isActive")
-	private Boolean isActive = false;
+	private Boolean isActive = true;
 	
 	public long getId() {
 		return id;

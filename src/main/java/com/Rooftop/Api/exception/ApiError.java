@@ -7,23 +7,30 @@ import org.springframework.http.HttpStatus;
 
 public class ApiError {
 	
-    private HttpStatus status;
-    private String message;
-    private List<String> errors;
+    private Boolean error = true;
+    private String message= "Text not found";
+    private Integer code = 404;
     
-    public ApiError(HttpStatus status, String message, List<String> errors) {
-        super();
-        this.status = status;
-        this.message = message;
-        this.errors = errors;
-    }
     
-    public ApiError(HttpStatus status, String message, String error) {
-        super();
-        this.status = status;
-        this.message = message;
-        errors = Arrays.asList(error);
-    }
-		
+	public Boolean getError() {
+		return error;
+	}
+	public void setError(Boolean error) {
+		this.error = error;
+	}
+	public String getMessage() {
+		return message;
+	}
+	public void setMessage(String message) {
+		this.message = message;
+	}
+	public Integer getCode() {
+		return code;
+	}
+	public void setCode(Integer code) {
+		this.code = code;
+	}  
+	
+    
 	
 }

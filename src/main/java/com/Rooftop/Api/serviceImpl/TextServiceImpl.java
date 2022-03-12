@@ -7,6 +7,7 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Optional;
 
 import javax.xml.bind.DatatypeConverter;
 
@@ -79,6 +80,11 @@ public class TextServiceImpl implements TextService{
 			return validate.getId();
 		}		
 		return null;
+	}
+	
+	public Optional<Text> getText(Long id) {
+		Optional<Text> text = textRepository.findById(id);
+		return text;
 	}
 
 }
