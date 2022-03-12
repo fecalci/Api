@@ -19,6 +19,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.Rooftop.Api.exception.ApiError;
+import com.Rooftop.Api.exception.EmptyJsonResponse;
 import com.Rooftop.Api.model.ResponseDto;
 import com.Rooftop.Api.model.Text;
 import com.Rooftop.Api.model.dto.TextDto;
@@ -90,9 +91,17 @@ public class textController {
 		return new ResponseEntity<>(textPaginated, HttpStatus.OK);
 	}
 	
+	
 	@RequestMapping(method = RequestMethod.DELETE, value="/text/{id}", produces= MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> deleteTextById(@PathVariable("id") Long textId) {
-		return new ResponseEntity<>("text", HttpStatus.OK);
+	public ResponseEntity deleteTextById(@PathVariable("id") Long textId) {		
+		Optional<Text> text = textRepository.findById(textId);
+		if(text.isEmpty() || !text.get().getIsActive()) {
+			ApiError error = new ApiError();
+			return ResponseEntity.ok(error);
+		}
+		text.get().setIsActive(false);
+		textRepository.save(text.get());
+		return ResponseEntity.ok(new EmptyJsonResponse());
 	}
 
 }
