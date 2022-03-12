@@ -1,5 +1,6 @@
 package com.Rooftop.Api.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,15 +38,22 @@ public class textController {
 	private TextRepository textRepository;
 	
 	@RequestMapping(method = RequestMethod.POST, value="/text", produces= MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<ResponseDto> submitText(@RequestBody TextDto textDto) {		
+	public ResponseEntity submitText(@RequestBody TextDto textDto) {	
+		ResponseDto submitResponse = new ResponseDto();
+		try {				
 		//Valido la cantidad de chars especificados
 			Integer chars = (textDto.getParameter() == null || textDto.getParameter() < 2) ? 2 : textDto.getParameter() > textDto.getContent().length() ?  
 					textDto.getContent().length() : textDto.getParameter().intValue();
 			Text text = textService.submitText(textDto.getContent(),chars);				
-			ResponseDto submitResponse = new ResponseDto();
 			submitResponse.setId(text.getId());
 			submitResponse.setUrl("/text/" + submitResponse.getId());
-		
+		}
+		catch(Exception e) {
+			ApiError error = new ApiError();
+			error.setMessage("An error occurred when processing the text");
+			error.setCode(422);
+			return ResponseEntity.ok(error);
+		}			
 		return ResponseEntity.ok(submitResponse);
 	}
 	
@@ -65,42 +73,69 @@ public class textController {
 	@SuppressWarnings("rawtypes")
 	@RequestMapping(method = RequestMethod.GET, value="/text/{id}")
 	public ResponseEntity getTextById(@PathVariable("id")  Long textId) {
-		Optional<Text> text = textService.getText(textId);	
-		if(text.isEmpty()) {
-			ApiError error = new ApiError();
-			return ResponseEntity.ok(error);
+		Optional<Text> text = Optional.empty();
+		try {
+			text = textService.getText(textId);	
+			if(text.isEmpty()) {
+				ApiError error = new ApiError();
+				return ResponseEntity.ok(error);
+			}
 		}
+		catch(Exception e) {
+			ApiError error = new ApiError();
+			error.setMessage("An error occurred when processing the text");
+			error.setCode(422);
+			return ResponseEntity.ok(error);
+		}	
 		return ResponseEntity.ok(text);
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value="/text", produces= MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity getText(Integer chars, Integer page, Integer rpp) {
 		//Valido la información recibida según reglas de negocio
-		chars = (chars == null || chars < 2) ? 2: chars.intValue();
-		page = (page == null || page <= 1) ? 1: chars.intValue();
-		rpp = (rpp == null || rpp <= 10) ? 10 : rpp > 100 ? 100: rpp.intValue();  
-		//Utilizo el char hasheado ya que así lo tengo almacenado en db
-		String charsHashed = textService.hashText(chars.toString());
-		//Creo la paginación según lo recibido. Utilizo -1 para página porque utiliza subíndice 0
-		Pageable pageWithElements = PageRequest.of(page-1, rpp);
-		List<Text> textPaginated = textRepository.findAllByParameter(charsHashed, pageWithElements);
-		//Para cada objecto Text recibido seteo el parámetro al recibido, para no devolver el HASH en el request según reglas de negocio.
-		for(Text element : textPaginated) {
-			element.setParameter(chars.toString());
+		List<Text> textPaginated = new ArrayList<Text>();
+		try {
+			chars = (chars == null || chars < 2) ? 2: chars.intValue();
+			page = (page == null || page <= 1) ? 1: page;
+			rpp = (rpp == null || rpp <= 10) ? 10 : rpp >= 100 ? 100: rpp;  
+			//Utilizo el char hasheado ya que así lo tengo almacenado en db
+			String charsHashed = textService.hashText(chars.toString());
+			//Creo la paginación según lo recibido. Utilizo -1 para página porque utiliza subíndice 0
+			Pageable pageWithElements = PageRequest.of(page-1, rpp);
+			textPaginated = textRepository.findAllByParameterAndIsActive(charsHashed, true, pageWithElements);
+			//Para cada objecto Text recibido seteo el parámetro al recibido, para no devolver el HASH en el request según reglas de negocio.
+			for(Text element : textPaginated) {
+				element.setParameter(chars.toString());
+			}
 		}
+		catch(Exception e) {
+			ApiError error = new ApiError();
+			error.setMessage("An error occurred when processing the text");
+			error.setCode(422);
+			return ResponseEntity.ok(error);
+		}	
 		return new ResponseEntity<>(textPaginated, HttpStatus.OK);
 	}
 	
 	
 	@RequestMapping(method = RequestMethod.DELETE, value="/text/{id}", produces= MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity deleteTextById(@PathVariable("id") Long textId) {		
-		Optional<Text> text = textRepository.findById(textId);
-		if(text.isEmpty() || !text.get().getIsActive()) {
-			ApiError error = new ApiError();
-			return ResponseEntity.ok(error);
+		try {
+			Optional<Text> text = textRepository.findByIdAndIsActive(textId, true);
+			if(text.isEmpty() || !text.get().getIsActive()) {
+				ApiError error = new ApiError();
+				return ResponseEntity.ok(error);
+			}
+			text.get().setIsActive(false);
+			textRepository.save(text.get());
+			
 		}
-		text.get().setIsActive(false);
-		textRepository.save(text.get());
+		catch(Exception e) {
+			ApiError error = new ApiError();
+			error.setMessage("An error occurred when processing the text");
+			error.setCode(422);
+			return ResponseEntity.ok(error);
+		}	
 		return ResponseEntity.ok(new EmptyJsonResponse());
 	}
 

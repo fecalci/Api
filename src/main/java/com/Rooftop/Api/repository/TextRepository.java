@@ -22,6 +22,8 @@ public interface TextRepository extends JpaRepository <Text,Long> {
 	
 	Optional<Text> findById(Long id);
 	
-	List<Text> findAllByParameter(String chars, Pageable page);
+	Optional<Text> findByIdAndIsActive(Long id, Boolean isActive);
+	
+	List<Text> findAllByParameterAndIsActive(String chars, Boolean isActive, Pageable page);
 	
 }
