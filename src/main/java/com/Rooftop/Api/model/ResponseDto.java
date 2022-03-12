@@ -1,6 +1,5 @@
 package com.Rooftop.Api.model;
 
-import javax.persistence.Entity;
 
 public class ResponseDto {
 	

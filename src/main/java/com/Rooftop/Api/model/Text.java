@@ -33,7 +33,6 @@ public class Text {
 	private String parameter;	
 	
 	@Column(name ="result")
-	@JsonAnyGetter
 	@ElementCollection
 	private Map<String,Integer> result;
 	

@@ -15,15 +15,16 @@ import org.springframework.stereotype.Service;
 
 import com.Rooftop.Api.model.Text;
 import com.Rooftop.Api.repository.TextRepository;
+import com.Rooftop.Api.service.TextService;
 
 @Service
-public class TextServiceImpl {
+public class TextServiceImpl implements TextService{
 	
 	@Autowired 
 	private TextRepository textRepository;
 	
 	
-	public void submitText(String text, Integer chars) {			
+	public Text submitText(String text, Integer chars) {			
 		Text myText = new Text();
 		
 		//Hasheo el texto y parametros recibidos, para validarlos y guardarlos en base de datos.
@@ -31,14 +32,15 @@ public class TextServiceImpl {
 		String hashedParameter = this.hashText(chars.toString());		
 		Long idExistence = this.validateExistence(hashedText, hashedParameter);
 		if (idExistence != null) {
-			System.out.println("Ese conjunto de datos ya existe, por favor pruebe uno distinto"+ idExistence);
+			myText.setId(idExistence);
+			return myText;
 		}
 		else {
 			//Creo un HashMap para almacenar los key-values
 			HashMap<String, Integer> map = new HashMap<>();
 			//Recorro el texto para analizarlo y contar repeticiones
-			for(int i = 0; i < text.length()-1;++i) {
-				String myString = text.substring(i, i+1);
+			for(int i = 0; i < text.length()-(chars-1);++i) {
+				String myString = text.substring(i, i + chars);
 				if(!map.containsKey(myString)) {
 					map.put(myString, 1);
 				}
@@ -51,6 +53,7 @@ public class TextServiceImpl {
 			myText.setResult(map);
 			textRepository.save(myText);
 		}
+		return myText;
 		
 	}
 	
@@ -63,7 +66,6 @@ public class TextServiceImpl {
 				MessageDigest md = MessageDigest.getInstance("MD5");
 				byte[] theMD5Digest = md.digest(bytesOfMessage);
 				myHash = DatatypeConverter.printHexBinary(theMD5Digest).toUpperCase();
-				System.out.println("El hash: "+myHash);
 			} catch (NoSuchAlgorithmException e) {
 				e.printStackTrace();
 			}						
@@ -72,7 +74,7 @@ public class TextServiceImpl {
 	}
 	
 	public Long validateExistence(String textHashed, String charsHashed) {		
-		Text validate = textRepository.findByParameterAndContent(textHashed, charsHashed);
+		Text validate = textRepository.findByContentAndParameter(textHashed, charsHashed);
 		if(validate != null){
 			return validate.getId();
 		}		

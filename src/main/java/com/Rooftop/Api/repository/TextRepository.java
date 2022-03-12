@@ -12,6 +12,6 @@ public interface TextRepository extends JpaRepository <Text,Long> {
 	
 	Text findByParameter(String charsHashed);
 	
-	Text findByParameterAndContent(String textHashed, String charsHashed);
+	Text findByContentAndParameter(String textHashed, String charsHashed);
 	
 }

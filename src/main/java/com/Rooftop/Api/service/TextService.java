@@ -1,10 +1,10 @@
 package com.Rooftop.Api.service;
 
-import java.util.List;
+import com.Rooftop.Api.model.Text;
 
 public interface TextService {
 
-	void submitText(String text, Integer chars);
+	Text submitText(String text, Integer chars);
 	
 	String hashText(String text);
 	
