@@ -9,9 +9,9 @@ Buen día! Les dejo la API realizada para el challenge de Rooftop Academy, since
 
 - Para utilizar la base de datos h2 y realizar consultas con la app levantada y funcionando --> http://localhost:8080/h2-console \
 Credenciales --> \
-Saved settings : Generic H2 (Embedded)\
-Setting Name : Generic H2 (Embedded)
-Driver Class : org.h2.Driver
-JDBC URL : jdbc:h2:mem:testdb
-User Name : sa
-Password : 
+    Saved settings : Generic H2 (Embedded) \
+    Setting Name : Generic H2 (Embedded) \
+    Driver Class : org.h2.Driver \ 
+    JDBC URL : jdbc:h2:mem:testdb \
+    User Name : sa \
+    Password : \
